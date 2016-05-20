@@ -59,6 +59,7 @@ message FillerParameter {
     AVERAGE = 2;
   }
   optional VarianceNorm variance_norm = 8 [default = FAN_IN];
+  optional BlobProto matrix = 9; // the matrix to use as a seed
 }
 
 message NetParameter {

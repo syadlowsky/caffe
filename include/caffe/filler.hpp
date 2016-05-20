@@ -45,6 +45,20 @@ class ConstantFiller : public Filler<Dtype> {
   }
 };
 
+/// @brief Fills a Blob with fixed matrix @f$ x = 0 @f$.
+template <typename Dtype>
+class MatrixFiller : public Filler<Dtype> {
+ public:
+  explicit MatrixFiller(const FillerParameter& param)
+      : Filler<Dtype>(param) {}
+  virtual void Fill(Blob<Dtype>* blob) {
+    const BlobProto& matrix = this->filler_param_.matrix();
+    blob->FromProto(matrix, false);
+    CHECK_EQ(this->filler_param_.sparse(), -1)
+         << "Sparsity not supported by this Filler.";
+  }
+};
+
 /// @brief Fills a Blob with uniformly distributed values @f$ x\sim U(a, b) @f$.
 template <typename Dtype>
 class UniformFiller : public Filler<Dtype> {
@@ -284,6 +298,8 @@ Filler<Dtype>* GetFiller(const FillerParameter& param) {
     return new MSRAFiller<Dtype>(param);
   } else if (type == "bilinear") {
     return new BilinearFiller<Dtype>(param);
+  } else if (type == "matrix") {
+    return new MatrixFiller<Dtype>(param);
   } else {
     CHECK(false) << "Unknown filler name: " << param.type();
   }
